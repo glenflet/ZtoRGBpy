@@ -55,7 +55,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 __contact__ = "Glen Fletcher <mail@glenfletcher.com>"
-__version__ = "0.1"
+__version__ = "0.2"
 __title__ = "ZtoRGBpy"
 __desc__ = """\
 Complex number to perceptually uniform RGB subset mapping library"""

@@ -31,12 +31,11 @@ import matplotlib.pyplot as plt
 import matplotlib.colorbar as cbar
 from matplotlib.axes import SubplotBase
 import numpy as np
-from ZtoRGB.core import remap
+from ZtoRGBpy._core import remap, LinearScale, sRGB
 
 def colorbar(ax=None, cax=None, use_gridspec=True,
-             vmin=0, vmax=1, scale='linear', **kw):
-    """
-    Generate a Matplotlib Colorbar
+             scale=LinearScale(1.0), profile=sRGB, **kw):
+    """Generate a Matplotlib Colorbar
 
     Renders a special colorbar showing phase rotation on the oppsite
     axis to the magnitude (no axis labels)
@@ -52,12 +51,46 @@ def colorbar(ax=None, cax=None, use_gridspec=True,
     phase = np.linspace(-np.pi, np.pi, 45)
     magnitude = np.linspace(1, 0, 1000)
     phase, magnitude = np.meshgrid(phase, magnitude)
-    rgb = remap(magnitude*np.exp(1j*phase))
-    z_cb = cax.imshow(rgb, aspect="auto", extent=[0, np.pi*2, vmin, vmax])
-    cax.set_yscale(scale)
+    z_cb = cax.imshow(remap(magnitude*np.exp(1j*phase),
+                            profile=profile),
+                      aspect="auto",
+                      extent=[0, np.pi*2, 0, 1.0])
     cax.xaxis.set_visible(False)
     cax.yaxis.tick_right()
+    ticks = scale.ticks()
+    ticks = cax.set_yticks(ticks[0]), cax.set_yticklabels(ticks[1])
     cax.yaxis.set_ticks_position("right")
     cax.yaxis.set_label_position("right")
     plt.sca(current_ax)
     return z_cb, cax
+
+def colorwheel(ax=None, scale=LinearScale(1.0), profile=sRGB,
+               rotation=0, grid=False):
+    """Generate a Colorwheel
+
+    Renders a colorwheel, showing the colorspace, with optional grid
+    """
+    rline = np.linspace(-1, 1, 1001)
+    xmesh, ymesh = np.meshgrid(rline, rline)
+    zmesh = xmesh+1j*ymesh
+    zmesh *= np.exp(1j*rotation)
+    rgba = np.ones(zmesh.shape + (4,))
+    rgba[..., 3] = abs(zmesh) <= 1
+    rgba[..., 0:3] = remap(zmesh, profile=profile)
+    current_ax = plt.gca()
+    if ax is None:
+        ax = current_ax
+    z_im = ax.imshow(rgba, extent=[-1, 1, 1, -1])
+    ax.axis('off')
+    if grid:
+        pax = ax.figure.add_axes(ax.figbox, projection='polar', frameon=False)
+        ticks = scale.ticks()
+        ticks = pax.set_rticks(ticks[0]), pax.set_yticklabels(ticks[1])
+        pax.set_theta_zero_location("N")
+        pax.set_rlabel_position(290)
+        pax.yaxis.grid(True, which='major', linestyle='-')
+        pax.xaxis.grid(True, which='major', linestyle='-')
+    else:
+        pax = None
+    plt.sca(current_ax)
+    return z_im, pax

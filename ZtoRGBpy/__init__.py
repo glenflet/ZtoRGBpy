@@ -34,14 +34,15 @@ This is the only module you should need to import
 from ZtoRGBpy._info import __authors__, __copyright__, __license__, \
                            __contact__, __version__, __title__, __desc__
 
-from ZtoRGBpy._core import remap
+from ZtoRGBpy._core import remap, Scale, LinearScale, LogScale, \
+                           RGBColorProfile, sRGB_HIGH, sRGB_LOW, sRGB
 
 try:
-    from ZtoRGBpy._mpl import colorbar
+    from ZtoRGBpy._mpl import colorbar, colorwheel
 except ImportError:
-    pass
+# pylint: disable=C0111
+    def colorbar():
+        raise NotImplementedError("Reruires Matplotlib")
 
-__all__ = [
-    '__authors__', '__copyright__', '__license__',
-    '__contact__', '__version__', '__title__',
-    '__desc__', 'remap', 'colorbar']
+    def colorwheel():
+        raise NotImplementedError("Reruires Matplotlib")
