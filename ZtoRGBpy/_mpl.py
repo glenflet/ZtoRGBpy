@@ -96,3 +96,86 @@ def colorwheel(ax=None, scale=LinearScale(1.0), profile=sRGB,
         pax = None
     plt.sca(current_ax)
     return z_im, pax
+
+def imshow(Z, ax=None, scale=None, profile=sRGB, **kwargs):
+    """imshow(Z, ax=None, scale=None, profile=sRGB, aspect=None, \
+    interpolation=None, alpha=None, origin=None, extent=None, shape=None, \
+    filternorm=1, filterrad=4.0, **kwargs)
+    Display a complex image on the ax or the current axes.
+    
+    Parameters
+    ----------
+    Z : array_like, shape(n, m)
+        Display the complex data `Z` to ax or current axes.
+        Arrays are mapped to colors based on
+        ZtoRGBpy.remap(Z, scale=scale, profile=profile)
+        
+    ax : axes, optional, default: None
+        The axes to plot to, use the current axes like pyplot.imshow, if None
+        
+    scale : Scale, optional, default: None
+        The data scaling, if None, scale is choose to be a linear scale with
+        magnitude equal to abs(Z), i.e. LinearScale(abs(Z))
+        
+    profile : RGBColorProfile, optional, default: sRGB
+        The color profile to use for mapping Complex data to RGB
+        
+    aspect : ['auto' | 'equal' | scalar], optional, default: None
+        If 'auto', changes the image aspect ratio to match that of the
+        axes.
+    
+        If 'equal', and `extent` is None, changes the axes aspect ratio to
+        match that of the image. If `extent` is not `None`, the axes
+        aspect ratio is changed to match that of the extent.
+    
+        If None, default to rc ``image.aspect`` value.
+        
+    interpolation : string, optional, default: None
+        Acceptable values are 'none', 'nearest', 'bilinear', 'bicubic',
+        'spline16', 'spline36', 'hanning', 'hamming', 'hermite', 'kaiser',
+        'quadric', 'catrom', 'gaussian', 'bessel', 'mitchell', 'sinc',
+        'lanczos'
+    
+        If `interpolation` is None, default to rc `image.interpolation`.
+        See also the `filternorm` and `filterrad` parameters.
+        If `interpolation` is 'none', then no interpolation is performed
+        on the Agg, ps and pdf backends. Other backends will fall back to
+        'nearest'.
+        
+    alpha : scalar, optional, default: None
+        The alpha blending value, between 0 (transparent) and 1 (opaque)
+    
+    origin : ['upper' | 'lower'], optional, default: None
+        Place the [0,0] index of the array in the upper left or lower left
+        corner of the axes. If None, default to rc `image.origin`.
+    
+    extent : scalars (left, right, bottom, top), optional, default: None
+        The location, in data-coordinates, of the lower-left and
+        upper-right corners. If `None`, the image is positioned such that
+        the pixel centers fall on zero-based (row, column) indices.
+    
+    shape : scalars (columns, rows), optional, default: None
+        For raw buffer images
+    
+    filternorm : scalar, optional, default: 1
+        A parameter for the antigrain image resize filter.  From the
+        antigrain documentation, if `filternorm` = 1, the filter
+        normalizes integer values and corrects the rounding errors. It
+        doesn't do anything with the source floating point values, it
+        corrects only integers according to the rule of 1.0 which means
+        that any sum of pixel weights must be equal to 1.0.  So, the
+        filter function must produce a graph of the proper shape.
+    
+    filterrad : scalar, optional, default: 4.0
+        The filter radius for filters that have a radius parameter, i.e.
+        when interpolation is one of: 'sinc', 'lanczos' or 'blackman'
+    """
+    current_ax = plt.gca()
+    if ax is None:
+        ax = current_ax
+    z_im = ax.imshow(remap(Z, scale=scale, profile=profile), **kwargs)
+    # add meta data so ZtoRGBpy.colorbar can pull
+    #   scale and profile automatically
+    z_im.ZtoRGBpy_meta = {"scale": scale, "profile": profile}
+    plt.sca(current_ax)
+    return z_im

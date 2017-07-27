@@ -38,11 +38,14 @@ from ZtoRGBpy._core import remap, Scale, LinearScale, LogScale, \
                            RGBColorProfile, sRGB_HIGH, sRGB_LOW, sRGB
 
 try:
-    from ZtoRGBpy._mpl import colorbar, colorwheel
+    from ZtoRGBpy._mpl import colorbar, colorwheel, imshow
 except ImportError:
 # pylint: disable=C0111
     def colorbar():
         raise NotImplementedError("Reruires Matplotlib")
 
     def colorwheel():
+        raise NotImplementedError("Reruires Matplotlib")
+    
+    def imshow():
         raise NotImplementedError("Reruires Matplotlib")
