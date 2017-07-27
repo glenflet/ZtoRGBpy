@@ -7,6 +7,7 @@ Created on Fri Apr 11 00:30:51 2014
 from ez_setup import use_setuptools
 use_setuptools()
 from setuptools import setup, find_packages
+from packaging.version import Version
 import os.path
 import re
 
@@ -20,33 +21,9 @@ reimglink = re.compile(
 "^\[!\[(?P<label>[^\]]*)\]\((?P<src>[^\)]*)\)\]\((?P<href>[^\)]*)\)$")
 
 def read(fname):
-    """Read Markdown File And Convert to reST"""
-    imgindex = 0
-    lines = ""
-    for line in open(os.path.join(os.path.dirname(__file__), fname),'rt'):
-        m = reimg.match(line)
-        if m is not None:
-            g = m.groupdict()
-            if g['label'] is None:
-                g['label'] = 'image' + imgindex
-                imgindex += 1
-            lines = "|{label:s}|\n\n.. |{label:s}| image:: {src:s}\n".format(
-                        **g)
-            continue
-        m = reimglink.match(line)
-        if m is not None:
-            g = m.groupdict()
-            if g['label'] is None:
-                g['label'] = 'image' + imgindex
-                imgindex += 1
-            lines += "|{label:s}|\n\n.. |{label:s}| image:: {src:s}\n"\
-                "   :target: {href:s}".format(**g)
-            continue
-        if line[0:5] == "Note:":
-            line = ".. Note::" + line[5:]
-        line = relink.sub('`\g<label> <\g<href>>`_',line)
-        lines += line
-    return lines
+    return open(os.path.join(
+        os.path.dirname(__file__),
+        fname),'rt').read()
 
 def readlist(fname):
     return open(os.path.join(
@@ -63,7 +40,7 @@ setup(
     description=pkg['__desc__'],
     packages=find_packages(),
     url='https://github.com/glenflet/' + pkg['__title__'],
-    long_description=read('README.md'),
+    long_description=read('README.rst'),
     install_requires = ['numpy>=1.6,<2', 'matplotlib>=1.3,<3'],
     classifiers=[
         "Development Status :: 2 - Pre-Alpha",
@@ -76,5 +53,11 @@ setup(
         "Programming Language :: Python :: 2.7",
         "License :: OSI Approved :: MIT License"
     ],
+    command_options={
+        'build_sphinx': {
+            'project': ('setup.py', pkg['__title__']),
+            'version': ('setup.py', Version(pkg['__version__']).base_version),
+            'release': ('setup.py', pkg['__version__']),
+            }},
     zip_safe=True,
 )

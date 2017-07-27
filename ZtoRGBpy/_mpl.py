@@ -35,7 +35,8 @@ from ZtoRGBpy._core import remap, LinearScale, sRGB
 
 def colorbar(ax=None, cax=None, use_gridspec=True,
              scale=LinearScale(1.0), profile=sRGB, **kw):
-    """Generate a Matplotlib Colorbar
+    """colorbar(ax=None, cax=None, use_gridspec=True, scale=LinearScale(1.0), profile=sRGB)
+    Generate a Matplotlib Colorbar
 
     Renders a special colorbar showing phase rotation on the oppsite
     axis to the magnitude (no axis labels)
@@ -66,7 +67,8 @@ def colorbar(ax=None, cax=None, use_gridspec=True,
 
 def colorwheel(ax=None, scale=LinearScale(1.0), profile=sRGB,
                rotation=0, grid=False):
-    """Generate a Colorwheel
+    """colorwheel(ax=None, scale=LinearScale(1.0), profile=sRGB, rotation=0, grid=False)
+    Generate a Colorwheel
 
     Renders a colorwheel, showing the colorspace, with optional grid
     """

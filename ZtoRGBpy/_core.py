@@ -47,7 +47,9 @@ class Scale(object):
         raise NotImplementedError()
 
 class LinearScale(Scale):
-    """Standard Linear Scale Ranging from 0 to vmag"""
+    """LinearScale(vmag=1.0)
+    Provides a Scale Transformation representing a simple linear transformation
+    mapping [0, vmag] into the range [0, 1], when invoked."""
     _divisiors = [5, 10, 20, 25]
     def __init__(self, vmag=1.0):
         Scale.__init__(self)
@@ -55,15 +57,16 @@ class LinearScale(Scale):
         self.factor = 1/self.mag
 
     def __call__(self, value):
-        """Transform value with scaling function"""
         return value*self.factor
 
     def lmax(self):
-        """Returns the maximum Lightness"""
+        """
+        Returns the maximum Lightness"""
         return 1
 
     def ticks(self):
-        """Returns a list of tick marks suitable for a colorbar"""
+        """
+        Returns a list of tick marks suitable for a colorbar"""
         divisor = 0
         dfactor = 1.0
         while True:
@@ -89,7 +92,9 @@ class LinearScale(Scale):
         return offsets, steps
 
 class LogScale(Scale):
-    """Log Scale ranging from vmin with lightness = vLmax(0.9), to vmax"""
+    """LogScale(vmin=0.01, vmax=1.0, vLmax=0.9)
+    Provides a Scale Transformation representing a logarithmic transformation
+    mapping [vmin, vmax] into the range [1-vLmax, 1], when invoked."""
     def __init__(self, vmin=0.01, vmax=1.0, vLmax=0.9):
         Scale.__init__(self)
         self.logmin = np.log10(vmin)
@@ -99,17 +104,18 @@ class LogScale(Scale):
         self.factor = self.lightness_max/(self.logmax-self.logmin)
 
     def __call__(self, value):
-        """Transform value with scaling function"""
         avalue = abs(value)
         return self.lightness_buf+(value*(np.log10(avalue) -
                                           self.logmin)/avalue)*self.factor
 
     def lmax(self):
-        """Returns the maximum Lightness"""
+        """
+        Returns the maximum Lightness"""
         return self.lightness_max
 
     def ticks(self):
-        """Returns a list of tick marks suitable for a colorbar"""
+        """
+        Returns a list of tick marks suitable for a colorbar"""
         logrange = int(np.ceil(self.logmax - self.logmin)) + 1
         if logrange > 6:
             pass
@@ -121,8 +127,11 @@ class LogScale(Scale):
         return offsets, values
 
 class RGBColorProfile(object):
-    """RGB Colour Profile
+    """
+    RGB Colour Profile
 
+    Parameters
+    ----------
     weights: tuple of float, optional
         Colour component weight triple for conversion to the XYZ colour space
         Defaults to (2126.0, 7152.0, 772.0), matching the sRGB colour space.
@@ -160,7 +169,7 @@ def remap(data,
           scale=LinearScale(),
           profile=sRGB,
           return_int=False):
-    """
+    """remap(data, scale=LinearScale(), profile=sRGB, return_int=False)
     Convert array of complex value to RGB triples
 
     For 2d arrays of complex numbers the returned array is suitable
@@ -168,24 +177,24 @@ def remap(data,
 
     Parameters
     ----------
-    data: array_like
+    data : (...) array_like
         Complex input data.
-    scale: None or Scale object, optional
+    scale : Scale, optional
         Use to define the magnitude scaling of the data,
-        data is transformed by this object to range from 0 to 1
-    weights: tuple of float, optional
-        Colour component weight triple for conversion to the XYZ colour space
-        Defaults to (2126.0, 7152.0, 772.0), matching the sRGB colour space.
-    igamma: float, optional
-        Inverse gamma correction, Defaults to 2.0.
-    return_int: bool
+        data is transformed by this object to range from 0 to 1.
+        Defaults to LinearScale(1.0)
+    profile: RGBColorProfile, optional
+        ColorProfile respresenting the RGB colorspace to convert
+        the complex data to. Default to High Constrast sRGB.
+    return_int : bool
         If true returns integers in range 0-255 rather than floats in
         range 0.0-1.0, Defaults to false.
+
     Returns
     -------
-    out: ndarray
-        Array containg RGB colour values with shape z.shape + (3,),
-        with the last dimention respresnting the RGB triplets.
+    rgb : (..., 3) array
+        Array containg RGB colour values with the last dimention
+        respresnting the RGB triplets.
     """
     # Get colour ratios from profile
     red_ratio, blue_ratio = profile.getRatios()
