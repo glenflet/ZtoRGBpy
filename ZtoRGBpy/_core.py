@@ -48,6 +48,8 @@ class Scale(object):
 
 class LinearScale(Scale):
     """LinearScale(vmag=1.0)
+    Linear Scaling
+    
     Provides a Scale Transformation representing a simple linear transformation
     mapping [0, vmag] into the range [0, 1], when invoked."""
     _divisiors = [5, 10, 20, 25]
@@ -93,6 +95,8 @@ class LinearScale(Scale):
 
 class LogScale(Scale):
     """LogScale(vmin=0.01, vmax=1.0, vLmax=0.9)
+    Logarimthic Scaling
+    
     Provides a Scale Transformation representing a logarithmic transformation
     mapping [vmin, vmax] into the range [1-vLmax, 1], when invoked."""
     def __init__(self, vmin=0.01, vmax=1.0, vLmax=0.9):
@@ -162,7 +166,9 @@ class RGBColorProfile(object):
 # usage, for writing sRGB
 sRGB_HIGH = RGBColorProfile((2126.0, 7152.0, 722.0), 0.5)
 sRGB_LOW = RGBColorProfile((2126.0, 7152.0, 722.0), 1)
+"""Low Constrast sRGB Color Profile"""
 sRGB = sRGB_HIGH
+"""Same as sRGB_HIGH"""
 # pylint: enable=C0103
 
 def remap(data,

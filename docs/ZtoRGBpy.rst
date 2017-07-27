@@ -1,28 +1,36 @@
 .. automodule:: ZtoRGBpy
 
-    .. autofunction:: remap
-    
-    .. autofunction:: colorbar
-    
-    .. autofunction:: colorwheel
-
-    .. autoclass:: LinearScale
-        :members:
+    Plotting Functions
+    ------------------
+    .. currentmodule:: ZtoRGBpy._mpl
+    .. autosummary::
+        :toctree: reference/
         
-    .. autoclass:: LogScale
-        :members:
-
-    .. autoclass:: RGBColorProfile
-        :members:
-    
-    .. py:data:: sRGB_HIGH
-    
-        High Constrast sRGB Profile with :math:`\gamma=\frac{1}{2}`
-    
-    .. py:data:: sRGB_LOW
-    
-        Low Constrast sRGB Profile with :math:`\gamma=1`
+        imshow
+        colorbar
+        colorwheel
         
-    .. py:data:: sRGB
-    
-        Default sRGB Profile, same as sRGB_HIGH
+    Colormapping Functions
+    ----------------------
+    .. currentmodule:: ZtoRGBpy._core
+    .. autosummary::
+        :toctree: reference/
+        
+        remap
+
+    Scaling Classes
+    ---------------
+    .. currentmodule:: ZtoRGBpy._core
+    .. autosummary::
+        :toctree: reference/
+        
+        LinearScale
+        LogScale
+
+    RGB Color Profiles
+    ------------------
+    .. currentmodule:: ZtoRGBpy._core
+    .. autosummary::
+        :toctree: reference/
+        
+        RGBColorProfile

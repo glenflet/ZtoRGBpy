@@ -13,7 +13,7 @@ Requirements
 Version Numbering
 -----------------
 
-ZtoRGBpy user a version numbering system based on [PEP440](https://www.python.org/dev/peps/pep-0440/ "PEP 440 -- Version Identification and Dependency Specification"), with versions numbers `{major:d}.{minor:d}[.{patch:d}][.dev{year:0<4d}{month:0<2d}{day:0<2d}]` providing a minimum of major and minor version, with optional patch number for bug fixes, and development tag for pre-release builds.
+ZtoRGBpy user a version numbering system based on PEP440_, with versions numbers ``{major:d}.{minor:d}[.{patch:d}][.dev{year:0<4d}{month:0<2d}{day:0<2d}]`` providing a minimum of major and minor version, with optional patch number for bug fixes, and development tag for pre-release builds.
 
 Major Version
 +++++++++++++
@@ -30,3 +30,5 @@ Patch are solely for fixing bugs in the code or API, these will only change the 
 Development Version
 +++++++++++++++++++
 This is a Development release, has not be tested, it may be unstable or have breaks in the API, such a release should NOT be relied upon.
+
+.. _PEP440: https://www.python.org/dev/peps/pep-0440/

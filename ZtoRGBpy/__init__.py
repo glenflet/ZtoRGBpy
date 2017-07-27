@@ -23,10 +23,12 @@
 # SOFTWARE.
 #==============================================================================
 """
-ZtoRGBpy
-========
+ZtoRGBpy Module
+===============
 
-This is the only module you should need to import
+Complex number to perceptually uniform RGB subset mapping library
+Supports direaction transformation of numpy arrays using remap, and
+intergration with matplotlib using imshow, colorbar and colorwheel.
 
 .. moduleauthor:: Glen Fletcher <mail@glenfletcher.com>
 """
