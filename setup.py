@@ -35,7 +35,7 @@ setup(
     version=pkg['__version__'],
     author=pkg['__authors__'][0][0],
     author_email=pkg['__authors__'][0][1],
-    license=pkg['__license__'],
+    license='Apache License, Version 2.0',
     description=pkg['__desc__'],
     packages=find_packages(),
     url='https://' + pkg['__title__'].lower() + '.glenfletcher.com/',
@@ -50,11 +50,11 @@ setup(
         'plot': ['matplotlib>=1.3,<3']
     },
     classifiers=[
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Science/Research",
         "Natural Language :: English",
-        "License :: OSI Approved"
-        "Operating System :: OS Independent"
+        "License :: OSI Approved",
+        "Operating System :: OS Independent",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
