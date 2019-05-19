@@ -39,7 +39,7 @@ while the documentation including docstrings and comments embedded in the source
 [Creative Commons Attribution-ShareAlike 4.0 International License](https://creativecommons.org/licenses/by-sa/4.0)
 """
 __contact__ = "Glen Fletcher <mail@glenfletcher.com>"
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 __title__ = "ZtoRGBpy"
 __desc__ = """\
 Complex number to perceptually uniform RGB subset mapping library"""
