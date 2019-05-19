@@ -1,46 +1,108 @@
 # -*- coding: utf-8 -*-
-#==============================================================================
-# MIT License
+# =================================================================================
+#  Copyright 2019 Glen Fletcher <mail@glenfletcher.com>
 #
-# Copyright (c) 2017 Glen Fletcher
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
 #
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
+#    http://www.apache.org/licenses/LICENSE-2.0
 #
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
 #
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
-#==============================================================================
+#  All documentation this file as docstrings or comments are licensed under the
+#  Creative Commons Attribution-ShareAlike 4.0 International License; you may
+#  not use this documentation except in compliance with this License.
+#  You may obtain a copy of this License at
+#
+#    https://creativecommons.org/licenses/by-sa/4.0
+#
+# =================================================================================
 """
 ZtoRGB Matplotlib Module
 
-Provides extenstion functuons for matplotlib
+Provides extension functions for matplotlib
+
+.. moduleauthor:: Glen Fletcher <mail@glenfletcher.com>
 """
-import matplotlib.pyplot as plt
+from collections.abc import Mapping
+
 import matplotlib.colorbar as cbar
-from matplotlib.axes import SubplotBase
+import matplotlib.pyplot as plt
 import numpy as np
-from ZtoRGBpy._core import remap, LinearScale, sRGB
+from matplotlib.axes import SubplotBase
 
-def colorbar(ax=None, cax=None, use_gridspec=True,
-             scale=LinearScale(1.0), profile=sRGB, **kw):
-    """colorbar(ax=None, cax=None, use_gridspec=True, scale=LinearScale(1.0), profile=sRGB)
-    Generate a Matplotlib Colorbar
+from ZtoRGBpy._core import remap
 
-    Renders a special colorbar showing phase rotation on the oppsite
+
+def colorbar(mappable=None, ax=None, cax=None, scale=None, profile=None, use_gridspec=True, **kw):
+    """Generate a Matplotlib Colorbar
+
+    Renders a special colorbar showing phase rotation on the opposite
     axis to the magnitude (no axis labels)
+
+    Parameters
+    ----------
+    mappable: `AxesImage <matplotlib.image.AxesImage>` with ZtoRGBpy meta data, optional, default: `None`
+        An `AxesImage <matplotlib.image.AxesImage>` as returned by `imshow` or `colorwheel`.
+        Defaults to the current image, if `None`.
+
+    ax : `Axes <matplotlib.axes.Axes>`, list of Axes, optional, default: `None`
+        Parent axes from which space for a new colorbar axes will be stolen.
+        If a list of axes is given they will all be resized to make room for the colorbar axes.
+
+    cax : `Axes <matplotlib.axes.Axes>`,  optional, default: `None`
+        Axes into which the colorbar will be drawn.
+
+    scale : `Scale`, optional, default: `None`
+        `Scale` used by the mapping that the colorbar represents. Defaults to the scale include
+        in the ZtoRGBpy meta data for the mappable being used,
+
+    profile : `RGBColorProfile`, optional, default: `None`
+        `RGBColorProfile` used by the mapping that the colorbar represents. Defaults to the profile
+        include in the ZtoRGBpy meta data for the mappable being used,
+
+    use_gridspec : `bool`, optional, default: `True`
+        If ``cax`` is `None`, a new ``cax`` is created as an instance of Axes.
+        If ``ax`` is an instance of `Subplot <matplotlib.pyplot.subplot>` and ``use_gridspec`` is `True`,
+        ``cax`` is created as an instance of Subplot using the
+        `grid_spec <matplotlib.colorbar.make_axes_gridspec>` module.
+
+    Other Parameters
+    ----------------
+    **kwargs : `matplotlib.colorbar.make_axes` parameters
+        These parameters are passed to the underlying matplotlib function, used to generate the colorbar axes
+
+    Returns
+    -------
+    image : `AxesImage <matplotlib.image.AxesImage>`
+        image object representing the colorbar
+    axes : `Axes <matplotlib.axes.Axes>`
+        axes for the image object representing the colorbar
+
+
+    Example
+    -------
+
+    .. plot::
+        :format: doctest
+
+        >>> import ZtoRGBpy
+        >>> import numpy as np
+        >>> import matplotlib.pyplot as plt
+        >>> r = np.linspace(-5,5, 2001)
+        >>> x,y = np.meshgrid(r,r)
+        >>> z = x + 1j*y
+        >>> ZtoRGBpy.imshow(np.cos(z), extent=[-5,5,-5,5])
+        >>> ZtoRGBpy.colorbar()
+        >>> plt.show()
     """
+    if mappable is None:
+        mappable = plt.gci()
     current_ax = plt.gca()
     if cax is None:
         if ax is None:
@@ -49,28 +111,92 @@ def colorbar(ax=None, cax=None, use_gridspec=True,
             cax, kw = cbar.make_axes_gridspec(ax, **kw)
         else:
             cax, kw = cbar.make_axes(ax, **kw)
-    phase = np.linspace(-np.pi, np.pi, 45)
-    magnitude = np.linspace(1, 0, 1000)
-    phase, magnitude = np.meshgrid(phase, magnitude)
-    z_cb = cax.imshow(remap(magnitude*np.exp(1j*phase),
-                            profile=profile),
+    metadata = {}
+    if mappable is not None:
+        print(mappable)
+        if hasattr(mappable, '_ZtoRGBpy__meta'):
+            # noinspection PyProtectedMember
+            metadata = mappable._ZtoRGBpy__meta
+            if not isinstance(metadata, Mapping):
+                metadata = {}
+    if scale is None and 'scale' in metadata:
+        scale = metadata['scale']
+    if profile is None and 'profile' in metadata:
+        profile = metadata['profile']
+    if scale is None or profile is None:
+        raise RuntimeError('No scale and profile was '
+                           'found to use for colorbar creation. '
+                           'Either define them as parameters, or'
+                           'use a mappable created by `ZtoRBGpy.imshow`.')
+    try:
+        ticks, labels = scale.ticks()
+    except NotImplementedError:
+        raise NotImplementedError("{0!r:s} dose not support the rendering of a colorbar.".format(scale))
+    if "ticklocation" not in kw or kw["ticklocation"] == 'auto':
+        ticklocation = 'bottom' if kw["orientation"] == 'horizontal' else 'right'
+    else:
+        ticklocation = kw["ticklocation"]
+    if "orientation" not in kw or kw["orientation"] == 'vertical':
+        phase = np.linspace(-np.pi, np.pi, 45)
+        magnitude = np.linspace(1, 0, 1000)
+        phase, magnitude = np.meshgrid(phase, magnitude)
+        extent = [0, np.pi * 2, 0, 1.0]
+        long_axis, short_axis = cax.yaxis, cax.xaxis
+    else:
+        phase = np.linspace(np.pi, -np.pi, 45)
+        magnitude = np.linspace(0, 1, 1000)
+        magnitude, phase = np.meshgrid(magnitude, phase)
+        extent = [0, 1.0, 0, np.pi * 2]
+        long_axis, short_axis = cax.xaxis, cax.yaxis
+    z_cb = cax.imshow(remap(magnitude * np.exp(1j * phase), profile=profile),
                       aspect="auto",
-                      extent=[0, np.pi*2, 0, 1.0])
-    cax.xaxis.set_visible(False)
-    cax.yaxis.tick_right()
-    ticks = scale.ticks()
-    ticks = cax.set_yticks(ticks[0]), cax.set_yticklabels(ticks[1])
-    cax.yaxis.set_ticks_position("right")
-    cax.yaxis.set_label_position("right")
+                      extent=extent)
+    short_axis.set_visible(False)
+    long_axis.set_ticks(ticks)
+    long_axis.set_ticklabels(str(label) for label in labels)
+    long_axis.set_ticks_position(ticklocation)
+    long_axis.set_label_position(ticklocation)
     plt.sca(current_ax)
     return z_cb, cax
 
-def colorwheel(ax=None, scale=LinearScale(1.0), profile=sRGB,
-               rotation=0, grid=False):
-    """colorwheel(ax=None, scale=LinearScale(1.0), profile=sRGB, rotation=0, grid=False)
-    Generate a Colorwheel
 
-    Renders a colorwheel, showing the colorspace, with optional grid
+def colorwheel(ax=None, scale=None, profile=None, rotation=0, grid=False):
+    """Renders a colorwheel, showing the colorspace, with optional grid
+
+    Parameters
+    ----------
+    ax : `Axes <matplotlib.axes.Axes>`, optional, default: `None`
+        The axes to plot to. If `None`, use the current axes like `pyplot.imshow <matplotlib.pyplot.imshow>`\
+
+    scale : `Scale`, optional, default: `None`
+        This parameter is passed directly to `remap`\ ``(Z, scale=scale, profile=profile)``
+
+    profile : `RGBColorProfile`, optional, default: `None`
+        This parameter is passed directly to `remap`\ ``(Z, scale=scale, profile=profile)``
+
+    rotation: `float`, optional, default: ``0``
+        This is the angle in radians by which the colorwheel is rotated
+
+    grid: `bool`, optional, default: `False`
+        Boolean indicating if the grid should be drawn
+
+    Returns
+    -------
+    image : `AxesImage <matplotlib.image.AxesImage>`
+        Extra metadata about the complex mapping is added to this object
+    grid_axes : `Axes <matplotlib.axes.Axes>`
+        Present only if ``grid`` = `True`. The polar axes on which the grid is drawn
+
+    Example
+    -------
+
+    .. plot::
+        :format: doctest
+
+        >>> import ZtoRGBpy
+        >>> import matplotlib.pyplot as plt
+        >>> ZtoRGBpy.colorwheel()
+        >>> plt.show()
     """
     rline = np.linspace(-1, 1, 1001)
     xmesh, ymesh = np.meshgrid(rline, rline)
@@ -78,104 +204,86 @@ def colorwheel(ax=None, scale=LinearScale(1.0), profile=sRGB,
     zmesh *= np.exp(1j*rotation)
     rgba = np.ones(zmesh.shape + (4,))
     rgba[..., 3] = abs(zmesh) <= 1
-    rgba[..., 0:3] = remap(zmesh, profile=profile)
+    rgba[..., 0:3], scale, profile = remap(zmesh, scale=scale, profile=profile,
+                                           return_metadata=True)
     current_ax = plt.gca()
     if ax is None:
         ax = current_ax
     z_im = ax.imshow(rgba, extent=[-1, 1, 1, -1])
+    z_im._ZtoRGBpy__meta = {"scale": scale, "profile": profile}
     ax.axis('off')
     if grid:
         pax = ax.figure.add_axes(ax.figbox, projection='polar', frameon=False)
         ticks = scale.ticks()
-        ticks = pax.set_rticks(ticks[0]), pax.set_yticklabels(ticks[1])
+        pax.set_rticks(ticks[0]), pax.set_yticklabels(ticks[1])
         pax.set_theta_zero_location("N")
         pax.set_rlabel_position(290)
         pax.yaxis.grid(True, which='major', linestyle='-')
         pax.xaxis.grid(True, which='major', linestyle='-')
+        ret = z_im, pax
     else:
-        pax = None
+        ret = z_im
     plt.sca(current_ax)
-    return z_im, pax
+    plt.sci(z_im)
+    return ret
 
-def imshow(Z, ax=None, scale=None, profile=sRGB, **kwargs):
-    """imshow(Z, ax=None, scale=None, profile=sRGB, aspect=None, \
-    interpolation=None, alpha=None, origin=None, extent=None, shape=None, \
-    filternorm=1, filterrad=4.0, **kwargs)
-    Display a complex image on the ax or the current axes.
+
+def imshow(z, ax=None, scale=None, profile=None, **kwargs):
+    """Displays a complex image on the ax or the current axes.
+
+    Invokes `matplotlib.axes.Axes.imshow` on the results of
+    `remap`\ (z, scale, profile) and attachs scale and profile
+    to the returned object as metadata.
     
     Parameters
     ----------
-    Z : array_like, shape(n, m)
-        Display the complex data `Z` to ax or current axes.
-        Arrays are mapped to colors based on
-        ZtoRGBpy.remap(Z, scale=scale, profile=profile)
+    z : `array_like <numpy.asarray>` [N, M]
+        The complex data. This is mapped to colors based on
+        `remap`\ (z, scale=scale, profile=profile)
         
-    ax : axes, optional, default: None
-        The axes to plot to, use the current axes like pyplot.imshow, if None
+    ax : `Axes <matplotlib.axes.Axes>`, optional, default: `None`
+        The `axes <matplotlib.axes.Axes>` to plot to. If `None` use the current axes like `pyplot.imshow <matplotlib.pyplot.imshow>`
         
-    scale : Scale, optional, default: None
-        The data scaling, if None, scale is choose to be a linear scale with
-        magnitude equal to abs(Z), i.e. LinearScale(abs(Z))
+    scale : `Scale`, optional, default: `None`
+        This parameter is passed directly to `remap`\ ``(z, scale=scale, profile=profile)``
         
-    profile : RGBColorProfile, optional, default: sRGB
-        The color profile to use for mapping Complex data to RGB
-        
-    aspect : ['auto' | 'equal' | scalar], optional, default: None
-        If 'auto', changes the image aspect ratio to match that of the
-        axes.
-    
-        If 'equal', and `extent` is None, changes the axes aspect ratio to
-        match that of the image. If `extent` is not `None`, the axes
-        aspect ratio is changed to match that of the extent.
-    
-        If None, default to rc ``image.aspect`` value.
-        
-    interpolation : string, optional, default: None
-        Acceptable values are 'none', 'nearest', 'bilinear', 'bicubic',
-        'spline16', 'spline36', 'hanning', 'hamming', 'hermite', 'kaiser',
-        'quadric', 'catrom', 'gaussian', 'bessel', 'mitchell', 'sinc',
-        'lanczos'
-    
-        If `interpolation` is None, default to rc `image.interpolation`.
-        See also the `filternorm` and `filterrad` parameters.
-        If `interpolation` is 'none', then no interpolation is performed
-        on the Agg, ps and pdf backends. Other backends will fall back to
-        'nearest'.
-        
-    alpha : scalar, optional, default: None
-        The alpha blending value, between 0 (transparent) and 1 (opaque)
-    
-    origin : ['upper' | 'lower'], optional, default: None
-        Place the [0,0] index of the array in the upper left or lower left
-        corner of the axes. If None, default to rc `image.origin`.
-    
-    extent : scalars (left, right, bottom, top), optional, default: None
-        The location, in data-coordinates, of the lower-left and
-        upper-right corners. If `None`, the image is positioned such that
-        the pixel centers fall on zero-based (row, column) indices.
-    
-    shape : scalars (columns, rows), optional, default: None
-        For raw buffer images
-    
-    filternorm : scalar, optional, default: 1
-        A parameter for the antigrain image resize filter.  From the
-        antigrain documentation, if `filternorm` = 1, the filter
-        normalizes integer values and corrects the rounding errors. It
-        doesn't do anything with the source floating point values, it
-        corrects only integers according to the rule of 1.0 which means
-        that any sum of pixel weights must be equal to 1.0.  So, the
-        filter function must produce a graph of the proper shape.
-    
-    filterrad : scalar, optional, default: 4.0
-        The filter radius for filters that have a radius parameter, i.e.
-        when interpolation is one of: 'sinc', 'lanczos' or 'blackman'
+    profile : `RGBColorProfile`, optional, default: `None`
+        This parameter is passed directly to `remap`\ ``(z, scale=scale, profile=profile)``
+
+    Other Parameters
+    ----------------
+    **kwargs : `matplotlib.axes.Axes.imshow` parameters
+        These parameters are passed to the underlying matplotlib function
+
+    Returns
+    -------
+    image : `matplotlib.image.AxesImage`
+        Extra metadata about the complex mapping is added to this object
+
+    Example
+    -------
+
+    .. plot::
+        :format: doctest
+
+        >>> import ZtoRGBpy
+        >>> import numpy as np
+        >>> import matplotlib.pyplot as plt
+        >>> r = np.linspace(-5,5, 2001)
+        >>> x,y = np.meshgrid(r,r)
+        >>> z = x + 1j*y
+        >>> ZtoRGBpy.imshow(np.cos(z), extent=[-5,5,-5,5])
+        >>> plt.show()
     """
     current_ax = plt.gca()
     if ax is None:
         ax = current_ax
-    z_im = ax.imshow(remap(Z, scale=scale, profile=profile), **kwargs)
+    rgb, scale, profile = remap(z, scale=scale, profile=profile,
+                                return_metadata=True)
+    z_im = ax.imshow(rgb, **kwargs)
     # add meta data so ZtoRGBpy.colorbar can pull
     #   scale and profile automatically
-    z_im.ZtoRGBpy_meta = {"scale": scale, "profile": profile}
-    plt.sca(current_ax)
+    z_im._ZtoRGBpy__meta = {"scale": scale, "profile": profile}
+    plt.sca(ax)
+    plt.sci(z_im)
     return z_im

@@ -1,53 +1,61 @@
 # -*- coding: utf-8 -*-
-#==============================================================================
-# MIT License
+# =================================================================================
+#  Copyright 2019 Glen Fletcher <mail@glenfletcher.com>
 #
-# Copyright (c) 2017 Glen Fletcher
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
 #
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
+#    http://www.apache.org/licenses/LICENSE-2.0
 #
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
 #
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
-#==============================================================================
+#  All documentation this file as docstrings or comments are licensed under the
+#  Creative Commons Attribution-ShareAlike 4.0 International License; you may
+#  not use this documentation except in compliance with this License.
+#  You may obtain a copy of this License at
+#
+#    https://creativecommons.org/licenses/by-sa/4.0
+#
+# =================================================================================
 """
-ZtoRGBpy Module
-===============
+Reference
+=========
 
 Complex number to perceptually uniform RGB subset mapping library
-Supports direaction transformation of numpy arrays using remap, and
-intergration with matplotlib using imshow, colorbar and colorwheel.
+Supports direct transformation of numpy arrays using remap, and
+integration with matplotlib using imshow, colorbar and colorwheel.
 
 .. moduleauthor:: Glen Fletcher <mail@glenfletcher.com>
 """
 
-from ZtoRGBpy._info import __authors__, __copyright__, __license__, \
-                           __contact__, __version__, __title__, __desc__
-
 from ZtoRGBpy._core import remap, Scale, LinearScale, LogScale, \
-                           RGBColorProfile, sRGB_HIGH, sRGB_LOW, sRGB
+    RGBColorProfile, sRGB_HIGH, sRGB_LOW, sRGB
+from ZtoRGBpy._info import __authors__, __copyright__, __license__, \
+    __contact__, __version__, __title__, __desc__
 
 try:
     from ZtoRGBpy._mpl import colorbar, colorwheel, imshow
 except ImportError:
-# pylint: disable=C0111
+    # pylint: disable=C0111
+    _mpl_requirement = "Requires matplotlib>=1.3,<3"
+
     def colorbar():
-        raise NotImplementedError("Reruires Matplotlib")
+        raise NotImplementedError(_mpl_requirement)
 
     def colorwheel():
-        raise NotImplementedError("Reruires Matplotlib")
+        raise NotImplementedError(_mpl_requirement)
     
     def imshow():
-        raise NotImplementedError("Reruires Matplotlib")
+        raise NotImplementedError(_mpl_requirement)
+
+_real_module = {}
+
+for name in list(locals().keys()):
+    if name[0] != "_":
+        _real_module[name] = locals()[name].__module__
+        locals()[name].__module__ = "ZtoRGBpy"

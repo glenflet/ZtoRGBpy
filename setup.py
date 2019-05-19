@@ -1,35 +1,34 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Fri Apr 11 00:30:51 2014
+# =======================================================================
+# This is setup script is released into the public domain.
+#
+# THIS SCRIPT IS PROVIDE "AS IS" "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+# OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+# ARISING FROM, OUT OF OR IN CONNECTION WITH THE SCRIPT OR THE USE OR
+# OTHER DEALINGS IN THE SCRIPT.
+#
+# THIS PUBLIC DOMAIN DEDICATION APPLIES ONLY TO THIS SETUP SCRIPT AND
+# NOT THE BUNDLED SOFTWARE OR DOCUMENTATION SEE THE LICENSE FILE FOR
+# DETAILS OF THE LICENSE OF THE BUNDLED SOFTWARE AND/OR DOCUMENTATION.
+# =======================================================================
+from ez_setup import use_setuptools;
 
-.. moduleauthor:: Glen Fletcher <glen.fletcher@alphaomega-technology.com.au>
-"""
-from ez_setup import use_setuptools
 use_setuptools()
 from setuptools import setup, find_packages
 from packaging.version import Version
 import os.path
-import re
 
 pkg_name = 'ZtoRGBpy'
 pkg = {}
-with open(os.path.join(pkg_name,'_info.py')) as f: exec(f.read(),pkg,pkg)
+with open(os.path.join(pkg_name, '_info.py')) as f:
+    exec(f.read(), pkg, pkg)
 
-reimg = re.compile("^!\[(?P<label>[^\]]*)\]\((?P<src>[^\)]*)\)$")
-relink = re.compile("\[(?P<label>[^\]]*)\]\((?P<href>[^\)]*)\)")
-reimglink = re.compile(
-"^\[!\[(?P<label>[^\]]*)\]\((?P<src>[^\)]*)\)\]\((?P<href>[^\)]*)\)$")
 
 def read(fname):
-    return open(os.path.join(
-        os.path.dirname(__file__),
-        fname),'rt').read()
-
-def readlist(fname):
-    return open(os.path.join(
-        os.path.dirname(__file__),
-        fname),'rt').read().split('\n')
-
+    return open(os.path.join(os.path.dirname(__file__), fname), 'rt').read()
 
 setup(
     name=pkg['__title__'],
@@ -39,19 +38,30 @@ setup(
     license=pkg['__license__'],
     description=pkg['__desc__'],
     packages=find_packages(),
-    url='https://github.com/glenflet/' + pkg['__title__'],
+    url='https://' + pkg['__title__'].lower() + '.glenfletcher.com/',
+    project_urls={
+        "Bug Tracker": "https://github.com/glenfletcher/" + pkg['__title__'].lower() + "/issues",
+        "Source Code": "https://github.com/glenfletcher/" + pkg['__title__'].lower(),
+    },
     long_description=read('README.rst'),
-    install_requires = ['numpy>=1.6,<2', 'matplotlib>=1.3,<3'],
+    setup_requires=['packaging'],
+    install_requires=['numpy>=1.6,<2'],
+    extras_require={
+        'plot': ['matplotlib>=1.3,<3']
+    },
     classifiers=[
-        "Development Status :: 2 - Pre-Alpha",
+        "Development Status :: 3 - Alpha",
         "Intended Audience :: Science/Research",
+        "Natural Language :: English",
+        "License :: OSI Approved"
+        "Operating System :: OS Independent"
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
         "Topic :: Scientific/Engineering :: Visualization",
         "Topic :: Scientific/Engineering :: Mathematics",
         "Topic :: Scientific/Engineering :: Physics",
-        'Natural Language :: English',
-        "Programming Language :: Python :: 2",
-        "Programming Language :: Python :: 2.7",
-        "License :: OSI Approved :: MIT License"
     ],
     command_options={
         'build_sphinx': {

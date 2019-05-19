@@ -1,21 +1,14 @@
-MIT License
+License Details
+===============
+Copyright (c) 2019 Glen Fletcher <mail@glenfletcher.com>
 
-Copyright (c) 2017 Glen Fletcher
+The source code for this package is licensed under the [Apache 2.0 License](http://www.apache.org/licenses/LICENSE-2.0),
+while the documentation including docstrings and comments embedded in the source code are licensed under the
+[Creative Commons Attribution-ShareAlike 4.0 International License](https://creativecommons.org/licenses/by-sa/4.0)
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+The source code refers to all files included in the package directory `ZtoRGBpy`, and any code samples included in the
+documentation.
+While the documentation refers to all files included in the `docs` directory, readme.rst and any docstrings embedded in
+the source files include in the `ZtoRGBpy` directory
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+The setup script `setup.py` is release to the public domain WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED.
